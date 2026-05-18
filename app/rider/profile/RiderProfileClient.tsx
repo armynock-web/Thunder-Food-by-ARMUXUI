@@ -91,6 +91,7 @@ export default function RiderProfileClient({ profile }: { profile: any }) {
                         แก้ไข
                       </Button>
                     </Link>
+                  </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="material-symbols-outlined text-xs text-[#ffd709]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                     <p className="text-xs font-bold uppercase tracking-widest text-[#ffd709] bg-[#ffd709]/10 px-2 py-0.5 rounded-full border border-[#ffd709]/20 inline-block">RIDER</p>

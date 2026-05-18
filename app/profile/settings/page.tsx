@@ -116,15 +116,7 @@ export default function ProfileSettingsPage() {
             </div>
           )}
 
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-500 font-thai">อีเมล (ไม่สามารถเปลี่ยนได้)</label>
-            <input
-              type="text"
-              disabled
-              value={email}
-              className="w-full bg-gray-50 border border-gray-200 text-gray-400 rounded-xl px-4 py-3 text-sm outline-none"
-            />
-          </div>
+
 
           <div className="space-y-1">
             <label className="text-xs font-semibold text-gray-500 font-thai">ชื่อ - นามสกุล</label>

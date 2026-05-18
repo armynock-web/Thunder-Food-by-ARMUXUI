@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
-import { ArrowLeft, User, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Phone, CheckCircle } from 'lucide-react'
 
 export default function ForgotPasswordPage() {
   const [username, setUsername] = useState('')
@@ -55,27 +55,28 @@ export default function ForgotPasswordPage() {
             <>
               <div className="mb-6">
                 <h2 className="text-xl font-black text-gray-900">รีเซ็ตรหัสผ่าน</h2>
-                <p className="text-gray-500 text-sm mt-1">กรอกชื่อผู้ใช้หรือเบอร์โทรศัพท์ที่ใช้สมัครเพื่อกู้คืนรหัสผ่าน</p>
+                <p className="text-gray-500 text-sm mt-1">กรอกเบอร์โทรศัพท์ที่ใช้สมัครเพื่อกู้คืนรหัสผ่าน</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="username" className="block text-sm font-bold text-gray-700 mb-1.5">
-                    ชื่อผู้ใช้งาน หรือ เบอร์โทรศัพท์
+                    เบอร์โทรศัพท์
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                       id="username"
-                      type="text"
+                      type="tel"
+                      pattern="[0-9]{10}"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Username หรือ 08xxxxxxxx"
+                      placeholder="08xxxxxxxx"
                       required
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ffd709] focus:border-transparent transition-all text-sm text-[#0e0e0e]"
                     />
                   </div>
-                  <span className="text-[11px] text-gray-400 mt-1.5 block">ระบบกู้คืนผ่านบัญชีอีเมลจำลองของ Thunder Delivery</span>
+                  <span className="text-[11px] text-gray-400 mt-1.5 block">ระบบกู้คืนผ่านบัญชีจำลองของ Thunder Delivery</span>
                 </div>
 
                 {error && (
