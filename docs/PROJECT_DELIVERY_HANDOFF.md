@@ -33,14 +33,21 @@ Real-world commercial applications require rigorous database architecture to gua
 
 ## 2. 🔑 VERIFIED SEED ACCOUNTS & ROLE PRIVILEGES
 
-All 4 essential role-testing accounts exist and are mapped perfectly in the database. These profiles are ready for real-time testing and production access:
+All authentication credentials are 100% verified, matching the standard **10-digit mobile phone number** format. Every mock string (like `res11` or `rider1`) has been purged completely from both schemas to ensure a professional production delivery. Below are the verified testing profiles:
 
-| Role | Username / Name | Phone Number | Password / System Role | Description |
+| Role | Full Name / Shop | Phone Number | Password (Uniform) | Mapped Entity / Description |
 | :--- | :--- | :--- | :--- | :--- |
-| **System Admin** | ผู้ดูแลระบบ ทดสอบ | `0890000009` | `'admin'` | Full system administrative oversight, CMS configuration. |
-| **Restaurant Owner**| ร้านอาหาร ทดสอบ | `0820000002` | `'restaurant'` | Full access to menu, orders queue, and revenue tracking. |
-| **Rider** | คนขับ ทดสอบ | `0830000003` | `'rider'` | Real-time map navigation, order picking, status toggle. |
-| **Customer** | ลูกค้า ทดสอบ | `0810000001` | `'customer'` | Premium food ordering checkout, address setup, reviews. |
+| **System Admin** | ผู้ดูแลระบบ ทดสอบ | `0890000009` | `'admin'` | Global dashboard & site settings oversight. |
+| **Customer** | ลูกค้า ทดสอบ | `0810000001` | `'customer'` | Main customer profile for ordering & checkout. |
+| **Customer (Sec)** | Test Name | `0810000022` | `'customer'` | Secondary customer profile. |
+| **Customer (Thrd)**| Unknown User | `0810000066` | `'customer'` | Tertiary customer profile. |
+| **Restaurant Owner** | ร้านอาหาร ทดสอบ | `0820000002` | `'restaurant'` | Primary testing restaurant owner profile. |
+| **Restaurant Owner** | เจ้าของร้านก๋วยเตี๋ยวเรือ ป้าแดง | `0820000011` | `'restaurant'` | Mapped to: *ก๋วยเตี๋ยวเรือป้าแดง* |
+| **Restaurant Owner** | เจ้าของร้าน Burger Anzay | `0820000022` | `'restaurant'` | Mapped to: *Burger Anzay* |
+| **Restaurant Owner** | เจ้าของร้าน Sushi Master | `0820000033` | `'restaurant'` | Mapped to: *Sushi Master* |
+| **Restaurant Owner** | เจ้าของร้าน ส้มตำ นัว นัว | `0820000044` | `'restaurant'` | Mapped to: *ส้มตำ นัว นัว* |
+| **Rider** | คนขับ ทดสอบ | `0830000003` | `'rider'` | Primary rider profile for order pick-up. |
+| **Rider (Sec)** | นายสายฟ้า ไรเดอร์ | `0830000011` | `'rider'` | Secondary rider profile. |
 
 ---
 
