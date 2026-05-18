@@ -4,7 +4,7 @@ import { useState } from "react"
 import { MapPin, Plus, Edit2, Trash2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { addUserAddress } from "@/app/actions/customer"
+import { addUserAddress, deleteUserAddress } from "@/app/actions/customer"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 
@@ -37,6 +37,20 @@ export default function ProfileAddressesClient({ initialAddresses }: { initialAd
     setLoading(false)
   }
 
+  const handleDelete = async (addressId: string) => {
+    if (!confirm("คุณต้องการลบที่อยู่นี้ใช่หรือไม่?")) return
+    setLoading(true)
+    const res = await deleteUserAddress(addressId)
+    if (res.error) {
+      toast({ title: 'Error', description: res.error, variant: 'destructive' })
+    } else {
+      toast({ title: 'ลบที่อยู่สำเร็จ' })
+      setAddresses(prev => prev.filter(a => a.id !== addressId))
+      router.refresh()
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="space-y-4">
       {addresses.map((addr) => (
@@ -58,7 +72,11 @@ export default function ProfileAddressesClient({ initialAddresses }: { initialAd
                 <p className="text-sm text-gray-500 mt-1">{addr.address}</p>
                 
                 <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-50">
-                  <button className="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-700">
+                  <button 
+                    onClick={() => handleDelete(addr.id)}
+                    disabled={loading}
+                    className="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-700 disabled:opacity-50"
+                  >
                     <Trash2 className="h-4 w-4" /> ลบ
                   </button>
                 </div>

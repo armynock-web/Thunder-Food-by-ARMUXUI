@@ -181,7 +181,11 @@ export default function RiderEarningsClient({ earnings }: { earnings: any[] }) {
                     mappedEarnings
                       .filter(e => {
                         if (activeTab === "today") return e.date === todayStr
-                        // Add proper week/month filters later
+                        const now = new Date()
+                        const diffTime = now.getTime() - e.rawDate.getTime()
+                        const diffDays = diffTime / (1000 * 60 * 60 * 24)
+                        if (activeTab === "week") return diffDays <= 7
+                        if (activeTab === "month") return diffDays <= 30
                         return true
                       })
                       .map((entry) => (
