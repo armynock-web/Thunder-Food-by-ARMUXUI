@@ -570,19 +570,16 @@ export default function CheckoutClient({ addresses, payments }: { addresses: any
 
                   {/* QR Code Container */}
                   <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md border border-gray-200/50">
-                    <div className="w-40 h-40 bg-gray-50 rounded-lg flex items-center justify-center relative overflow-hidden p-2">
-                      <svg className="w-full h-full text-[#0f2e5c]" viewBox="0 0 100 100" fill="currentColor">
-                        <path d="M10 10h20v20H10zm5 5v10h10V15zm25-5h10v10H40zm10 0h10v10H50zm10 0h20v20H60zm5 5v10h10V15zm-25 15h10v10H40zm20 0h10v10H60zm-50 20h20v20H10zm5 5v10h10V55zm25-5h10v10H40zm10 0h10v10H50zm10 0h10v10H60zm10 0h10v10H70zm-40 10h10v10H30zm20 0h10v10H50zm20 0h10v10H70zm-30 10h10v10H40zm20 0h10v10H60zm10 0h10v10H70zm-60 10h10v10H10zm10 0h10v10H20zm10 0h10v10H30zm20 0h10v10H50zm20 0h10v10H70z" />
-                        <rect x="38" y="38" width="24" height="24" rx="4" fill="white" stroke="#0f2e5c" strokeWidth="2" />
-                        <path d="M46 44h8v2H46zm0 4h8v2H46zm0 4h5v2H46z" fill="#0f2e5c" />
-                      </svg>
-                      <div className="absolute inset-0 bg-[#0f2e5c]/5 flex items-center justify-center pointer-events-none">
-                        <span className="material-symbols-outlined text-[#0f2e5c] text-3xl opacity-20">bolt</span>
-                      </div>
+                    <div className="w-40 h-40 bg-white rounded-lg flex items-center justify-center relative overflow-hidden p-1">
+                      <img 
+                        src={`https://promptpay.io/0991234567/${total}.png`}
+                        alt="PromptPay QR Code"
+                        className="w-full h-full object-contain mix-blend-multiply"
+                      />
                     </div>
                     
                     <p className="mt-3 text-[10px] font-bold text-gray-400 font-thai">สแกนชำระเงินตามจำนวนยอดรวม</p>
-                    <p className="text-gray-900 font-extrabold text-xl mt-1 tracking-tight">{formatPrice(total)}</p>
+                    <p className="text-[#0f2e5c] font-black text-2xl mt-1 tracking-tight">{formatPrice(total)}</p>
                   </div>
 
                   {/* Account Info */}
