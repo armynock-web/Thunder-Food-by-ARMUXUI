@@ -53,17 +53,15 @@ export default function AdminSettingsCMS() {
   const [imageUrl, setImageUrl] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
 
-  // Categories Local Storage / Simulated DB CRUD
-  const [categories, setCategories] = useState([
-    { id: "all", name: "ทั้งหมด", icon: "Utensils", color: "bg-primary" },
-    { id: "drinks", name: "เครื่องดื่ม", icon: "Coffee", color: "bg-amber-100" },
-    { id: "pizza", name: "พิซซ่า", icon: "Pizza", color: "bg-red-100" },
-    { id: "healthy", name: "สุขภาพ", icon: "Salad", color: "bg-green-100" },
-    { id: "dessert", name: "ของหวาน", icon: "IceCream", color: "bg-pink-100" },
-    { id: "noodles", name: "ก๋วยเตี๋ยว", icon: "Soup", color: "bg-orange-100" },
-    { id: "fastfood", name: "ฟาสต์ฟู้ด", icon: "Sandwich", color: "bg-yellow-100" },
-    { id: "seafood", name: "อาหารทะเล", icon: "Fish", color: "bg-blue-100" },
-  ]);
+  // Categories State
+  interface Category {
+    id: string;
+    slug: string;
+    name: string;
+    icon: string;
+    color: string;
+  }
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newCatName, setNewCatName] = useState("");
   const [newCatColor, setNewCatColor] = useState("bg-orange-100");
 
@@ -75,7 +73,21 @@ export default function AdminSettingsCMS() {
 
   useEffect(() => {
     fetchBanners();
+    fetchCategories();
   }, []);
+
+  async function fetchCategories() {
+    try {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (err: any) {
+      console.error("Fetch categories error:", err.message);
+    }
+  }
 
   async function fetchBanners() {
     setIsLoading(true);
@@ -238,32 +250,61 @@ export default function AdminSettingsCMS() {
   }
 
   // Category Catalog actions
-  function handleAddCategory(e: React.FormEvent) {
+  async function handleAddCategory(e: React.FormEvent) {
     e.preventDefault();
     if (!newCatName) return;
 
-    const id = newCatName.toLowerCase().replace(/\s+/g, "-");
-    const newCat = {
-      id,
-      name: newCatName,
-      icon: "Utensils",
-      color: newCatColor,
-    };
+    const slug = newCatName.toLowerCase().replace(/\s+/g, "-");
+    try {
+      const { data, error } = await supabase
+        .from("categories")
+        .insert([{
+          slug,
+          name: newCatName,
+          icon: "Utensils", // Default icon
+          color: newCatColor,
+          is_active: true
+        }])
+        .select();
 
-    setCategories([...categories, newCat]);
-    setNewCatName("");
-    toast({
-      title: "เพิ่มหมวดหมู่สำเร็จ!",
-      description: `สร้างหมวดหมู่ "${newCatName}" เรียบร้อยแล้ว`,
-    });
+      if (error) throw error;
+      
+      toast({
+        title: "เพิ่มหมวดหมู่สำเร็จ!",
+        description: `สร้างหมวดหมู่ "${newCatName}" เรียบร้อยแล้ว`,
+      });
+      setNewCatName("");
+      fetchCategories();
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่",
+        description: err.message,
+      });
+    }
   }
 
-  function handleDeleteCategory(id: string) {
-    if (id === "all") return;
-    setCategories(categories.filter(c => c.id !== id));
-    toast({
-      title: "ลบหมวดหมู่สำเร็จ!",
-    });
+  async function handleDeleteCategory(id: string) {
+    if (!confirm("คุณแน่ใจหรือไม่ที่จะลบหมวดหมู่นี้?")) return;
+    try {
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "ลบหมวดหมู่สำเร็จ!",
+      });
+      fetchCategories();
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "เกิดข้อผิดพลาดในการลบหมวดหมู่",
+        description: err.message,
+      });
+    }
   }
 
   function handleSavePlatformSettings() {
@@ -590,7 +631,7 @@ export default function AdminSettingsCMS() {
                     <span className="text-[10px] text-gray-400 font-mono mt-0.5 inline-block">{category.id}</span>
                   </div>
 
-                  {category.id !== "all" && (
+                  {category.slug !== "all" && (
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
                       className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-50 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"

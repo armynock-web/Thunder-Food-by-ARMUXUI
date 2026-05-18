@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
 import {
   Utensils,
   Coffee,
@@ -10,18 +12,37 @@ import {
   Soup,
   Sandwich,
   Fish,
+  ShoppingBag,
+  LucideIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const categories = [
-  { id: "all", name: "ทั้งหมด", icon: Utensils, color: "bg-primary" },
-  { id: "drinks", name: "เครื่องดื่ม", icon: Coffee, color: "bg-amber-100" },
-  { id: "pizza", name: "พิซซ่า", icon: Pizza, color: "bg-red-100" },
-  { id: "healthy", name: "สุขภาพ", icon: Salad, color: "bg-green-100" },
-  { id: "dessert", name: "ของหวาน", icon: IceCream, color: "bg-pink-100" },
-  { id: "noodles", name: "ก๋วยเตี๋ยว", icon: Soup, color: "bg-orange-100" },
-  { id: "fastfood", name: "ฟาสต์ฟู้ด", icon: Sandwich, color: "bg-yellow-100" },
-  { id: "seafood", name: "อาหารทะเล", icon: Fish, color: "bg-blue-100" },
+// Icon mapper for dynamic icons from DB
+const iconMap: Record<string, LucideIcon> = {
+  Utensils,
+  Coffee,
+  Pizza,
+  Salad,
+  IceCream,
+  Soup,
+  Sandwich,
+  Fish,
+  ShoppingBag
+};
+
+interface Category {
+  slug: string;
+  name: string;
+  icon: string;
+  color: string;
+}
+
+// Fallback just in case DB is slow or empty
+const defaultCategories: Category[] = [
+  { slug: "all", name: "ทั้งหมด", icon: "Utensils", color: "bg-primary" },
+  { slug: "drinks", name: "เครื่องดื่ม", icon: "Coffee", color: "bg-amber-100" },
+  { slug: "pizza", name: "พิซซ่า", icon: "Pizza", color: "bg-red-100" },
+  { slug: "healthy", name: "สุขภาพ", icon: "Salad", color: "bg-green-100" },
 ];
 
 interface CategorySectionProps {
@@ -33,19 +54,39 @@ export function CategorySection({
   selectedCategory = "all",
   onSelectCategory,
 }: CategorySectionProps) {
+  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setCategories(data);
+      }
+    }
+    fetchCategories();
+  }, [supabase]);
+
   return (
     <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
       <div className="flex gap-3 pb-2">
         {categories.map((category) => {
-          const isSelected = selectedCategory === category.id;
+          const isSelected = selectedCategory === category.slug;
+          const IconComponent = iconMap[category.icon] || Utensils;
+          
           return (
             <Link
-              key={category.id}
-              href={`/search?category=${category.id}`}
+              key={category.slug}
+              href={`/search?category=${category.slug}`}
               onClick={(e) => {
                 if (onSelectCategory) {
                   e.preventDefault();
-                  onSelectCategory(category.id);
+                  onSelectCategory(category.slug);
                 }
               }}
               className={cn(
@@ -60,7 +101,7 @@ export function CategorySection({
                     : category.color
                 )}
               >
-                <category.icon
+                <IconComponent
                   className={cn(
                     "w-6 h-6",
                     isSelected ? "text-accent-foreground" : "text-foreground"
