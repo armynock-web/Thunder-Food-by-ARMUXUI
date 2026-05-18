@@ -400,3 +400,44 @@ export async function updatePaymentStatus(orderId: string, paymentStatus: 'pendi
   revalidatePath('/customer')
   return { success: true }
 }
+
+// Proactive Fix: Solve the Rider Lock-in defect. Allow riders to release jobs back to the pool in case of emergencies.
+export async function cancelDeliveryByRider(orderId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  // Fetch order data to get customer_id for notification
+  const { data: orderData } = await supabase
+    .from('orders')
+    .select('customer_id, restaurants (name)')
+    .eq('id', orderId)
+    .single()
+
+  const { error } = await supabase
+    .from('orders')
+    .update({ 
+      rider_id: null, 
+      status: 'ready' // Revert status to 'ready' so other riders can accept it in the Job Pool
+    })
+    .eq('id', orderId)
+    .eq('rider_id', user.id)
+
+  if (error) return { error: error.message }
+
+  if (orderData) {
+    const restaurantName = (orderData.restaurants as any)?.name || 'ร้านค้า'
+    // Notify Customer about dispatch delay/change
+    await createSystemNotification(
+      orderData.customer_id,
+      'กำลังจัดหาไรเดอร์ท่านใหม่ 🚴',
+      `ไรเดอร์ท่านเดิมเกิดเหตุสุดวิสัย ระบบกำลังเร่งจัดหาคนขับคนใหม่เพื่อไปรับอาหารของคุณที่ร้าน "${restaurantName}"`,
+      'order',
+      { orderId }
+    )
+  }
+
+  revalidatePath('/rider')
+  revalidatePath('/customer')
+  return { success: true }
+}
