@@ -1,0 +1,62 @@
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config({ path: '.env.local' });
+
+// We need the service role key to create users directly, but we can also use the signup method.
+// Actually, using signup is fine, it will use the public anon key.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function seed() {
+  const accounts = [
+    { phone: '0810000001', role: 'customer', name: 'ลูกค้า ทดสอบ' },
+    { phone: '0820000002', role: 'restaurant', name: 'ร้านอาหาร ทดสอบ' },
+    { phone: '0830000003', role: 'rider', name: 'คนขับ ทดสอบ' },
+    { phone: '0890000009', role: 'admin', name: 'ผู้ดูแลระบบ ทดสอบ' }
+  ];
+
+  for (const acc of accounts) {
+    const email = `${acc.phone}@thunder-food.com`;
+    const password = 'password123';
+    
+    console.log(`Creating ${acc.role}...`);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: acc.name,
+          role: acc.role,
+        }
+      }
+    });
+
+    if (error) {
+      if (error.message.includes('already registered')) {
+        console.log(`${acc.phone} already exists.`);
+        // Try logging in to ensure it works? No need.
+      } else {
+        console.error(`Error creating ${acc.phone}:`, error.message);
+      }
+    } else {
+      console.log(`Created ${acc.phone} successfully.`);
+      
+      // Upsert into public.users
+      if (data.user) {
+        await supabase.from('users').upsert({
+          id: data.user.id,
+          role: acc.role,
+          full_name: acc.name,
+          phone: acc.phone
+        });
+        
+        // Ensure admin has right role in DB if signed up through normal flow
+        if (acc.role === 'admin') {
+           await supabase.from('users').update({ role: 'admin' }).eq('id', data.user.id);
+        }
+      }
+    }
+  }
+}
+
+seed();

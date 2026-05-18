@@ -57,26 +57,32 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Role-based protection
-    if (path.startsWith('/customer') && role !== 'customer') {
+    // Strict Role Isolation Protection
+    // 1. Admin MUST stay in /admin
+    if (role === 'admin' && !path.startsWith('/admin')) {
       const url = request.nextUrl.clone()
-      url.pathname = `/${role}`
+      url.pathname = '/admin'
       return NextResponse.redirect(url)
     }
-    if (path.startsWith('/restaurant') && role !== 'restaurant') {
+    
+    // 2. Restaurant MUST stay in /restaurant
+    if (role === 'restaurant' && !path.startsWith('/restaurant')) {
       const url = request.nextUrl.clone()
-      url.pathname = `/${role}`
+      url.pathname = '/restaurant'
       return NextResponse.redirect(url)
     }
-    if (path.startsWith('/rider') && role !== 'rider') {
+    
+    // 3. Rider MUST stay in /rider
+    if (role === 'rider' && !path.startsWith('/rider')) {
       const url = request.nextUrl.clone()
-      url.pathname = `/${role}`
+      url.pathname = '/rider'
       return NextResponse.redirect(url)
     }
-    // Admin route protection
-    if (path.startsWith('/admin') && role !== 'admin') {
+    
+    // 4. Customer CANNOT access /admin, /restaurant, or /rider
+    if (role === 'customer' && (path.startsWith('/admin') || path.startsWith('/restaurant') || path.startsWith('/rider'))) {
       const url = request.nextUrl.clone()
-      url.pathname = `/${role}`
+      url.pathname = '/'
       return NextResponse.redirect(url)
     }
   }
