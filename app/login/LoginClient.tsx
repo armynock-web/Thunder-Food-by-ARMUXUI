@@ -9,7 +9,6 @@ import { ThunderLogo } from '@/components/thunder/logo'
 
 export default function LoginClient() {
   const [isLoading, setIsLoading] = useState(false)
-  const [role, setRole] = useState('customer')
   const router = useRouter()
   const { showNotification } = useNotification()
 
@@ -18,8 +17,6 @@ export default function LoginClient() {
     setIsLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    formData.append('role', role)
-
     const result = await login(formData)
 
     if (result?.error) {
@@ -30,16 +27,26 @@ export default function LoginClient() {
         duration: 4000,
       })
       setIsLoading(false)
-    } else {
+    } else if (result?.success && result?.role) {
       showNotification({
         type: 'success',
         title: 'เข้าสู่ระบบสำเร็จ! 🎉',
         message: 'ระบบกำลังนำทางคุณเข้าสู่แดชบอร์ด...',
         duration: 3000,
       })
-      if (role === 'customer') router.push('/customer')
-      else if (role === 'restaurant') router.push('/restaurant')
-      else if (role === 'rider') router.push('/rider')
+      
+      const userRole = result.role
+      if (userRole === 'customer') {
+        router.push('/customer')
+      } else if (userRole === 'restaurant') {
+        router.push('/restaurant')
+      } else if (userRole === 'rider') {
+        router.push('/rider')
+      } else if (userRole === 'admin') {
+        router.push('/admin')
+      } else {
+        router.push('/')
+      }
     }
   }
 
@@ -98,54 +105,6 @@ export default function LoginClient() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-3">
-                <label className="font-label text-xs font-bold uppercase tracking-widest text-[#5c5b5b] px-1">เลือกประเภทผู้ใช้งาน</label>
-                <div className="grid grid-cols-3 gap-2 bg-[#f3f0ef] p-1.5 rounded-2xl">
-                  <label className="relative cursor-pointer group">
-                    <input 
-                      type="radio" 
-                      name="role_selection" 
-                      value="customer" 
-                      className="peer sr-only" 
-                      checked={role === 'customer'}
-                      onChange={() => setRole('customer')}
-                    />
-                    <div className="flex flex-col items-center justify-center py-3 rounded-xl transition-all duration-200 peer-checked:bg-[#0e0e0e] peer-checked:text-[#ffd709] text-[#5c5b5b] hover:bg-[#eae7e7]">
-                      <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
-                      <span className="text-[11px] font-bold">ลูกค้า</span>
-                    </div>
-                  </label>
-                  <label className="relative cursor-pointer group">
-                    <input 
-                      type="radio" 
-                      name="role_selection" 
-                      value="restaurant" 
-                      className="peer sr-only" 
-                      checked={role === 'restaurant'}
-                      onChange={() => setRole('restaurant')}
-                    />
-                    <div className="flex flex-col items-center justify-center py-3 rounded-xl transition-all duration-200 peer-checked:bg-[#0e0e0e] peer-checked:text-[#ffd709] text-[#5c5b5b] hover:bg-[#eae7e7]">
-                      <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>restaurant</span>
-                      <span className="text-[11px] font-bold">ร้านค้า</span>
-                    </div>
-                  </label>
-                  <label className="relative cursor-pointer group">
-                    <input 
-                      type="radio" 
-                      name="role_selection" 
-                      value="rider" 
-                      className="peer sr-only" 
-                      checked={role === 'rider'}
-                      onChange={() => setRole('rider')}
-                    />
-                    <div className="flex flex-col items-center justify-center py-3 rounded-xl transition-all duration-200 peer-checked:bg-[#0e0e0e] peer-checked:text-[#ffd709] text-[#5c5b5b] hover:bg-[#eae7e7]">
-                      <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>two_wheeler</span>
-                      <span className="text-[11px] font-bold">ไรเดอร์</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
               <div className="space-y-4">
                 <div className="group">
                   <label className="block font-label text-xs font-bold uppercase tracking-widest text-[#5c5b5b] px-1 mb-2">เบอร์โทรศัพท์</label>

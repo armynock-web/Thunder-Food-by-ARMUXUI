@@ -31,12 +31,9 @@ export async function login(formData: FormData) {
     .eq('id', data.user.id)
     .single()
   const role = profile?.role || data.user.user_metadata?.role || 'customer'
+  
   revalidatePath('/', 'layout')
-  if (role === 'customer') {
-    redirect('/')
-  } else {
-    redirect(`/${role}`)
-  }
+  return { success: true, role }
 }
 
 export async function register(formData: FormData) {
